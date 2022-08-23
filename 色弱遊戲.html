@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: bisque;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #container {
+            width: 525px;
+            height: 525px;
+            background-color: azure;
+            border-radius: 15px;
+            flex-wrap: wrap;
+            padding: 10px;
+            gap: 15px;
+            display: none;
+        }
+
+        #container.act {
+            display: flex;
+        }
+
+        .box {
+            background-color: rgb(48, 181, 233);
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 36px;
+        }
+
+        .answer {
+            opacity: 0.3;
+        }
+
+        .score {
+            position: absolute;
+            top: 0;
+            left: calc(50% - 50px);
+            width: 100px;
+            height: 100px;
+            background-color: rgb(84, 27, 219);
+            border-right: 15px;
+            text-align: center;
+            line-height: 100px;
+            font-size: 72px;
+            display: none;
+        }
+
+        .score.act {
+            display: block;
+        }
+
+        .start-game {
+            margin: auto;
+            background-color: aqua;
+            padding: 30px 50px;
+            font-size: 72px;
+            cursor: pointer;
+            border-radius: 20px;
+        }
+
+        .time {
+            font-size: 60px;
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            color: blueviolet;
+            text-shadow: 0 0 6px rgba(255, 0, 0, 0.912);
+        }
+        .resete{
+            visibility: hidden;
+            position: absolute;
+            left: 100px;
+            bottom: 100px;
+            font-size: 50px;
+            color: red;
+            background-color: aqua;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="start-game" onclick="startGame()">開始遊戲</div>
+    <div class="resete" onclick="resete()">重新開始</div>
+    <div class="score"></div>
+    <div id="container"></div>
+    <div class="time"></div>
+
+
+
+    <script>
+        const container = document.querySelector('#container');
+        const scoreContext = document.querySelector('.score');
+        const startGameBtn = document.querySelector('.start-game');
+        const timeBoard = document.querySelector('.time');
+        const reseteBtn = document.querySelector('.resete');
+
+        let colorUP = 0.3;
+        let time = 60;
+        let score = 0;
+        let level = 1;
+        
+        //重新開始
+        function resete(){
+            score = 0;
+            level = 1;
+            time = 60;
+            colorUP = 0.3;
+            reset();
+        }
+
+        function getCSS(level) {
+            let levelform = level - 1;
+            let mole = 485 - 15 * levelform;
+            let deno = 2 + levelform;
+            return mole / deno;
+        }
+
+        //重製色塊
+        function reset() {
+            scoreContext.innerHTML = score++;
+
+            let side = getCSS(level);
+
+
+            // console.log(level, side);
+
+            //清空boxes
+            container.innerHTML = '';
+            //顏色亂數
+            let colorR = Math.floor(Math.random() * 256);
+            let colorG = Math.floor(Math.random() * 256);
+            let colorB = Math.floor(Math.random() * 256);
+            //骰色子 取的亂數
+            let randomNumber = Math.floor(Math.random() * (level + 1) * (level + 1));
+
+            //生成box
+            for (let i = 0; i < (level + 1) * (level + 1); i++) {
+                if (i == randomNumber) {
+                    container.innerHTML += `
+                    <div class="box answer" style="width: ${side}px;height:${side}px;background-color: rgb(${colorR},${colorG},${colorB});opacity:${colorUP};" onclick="reset()"></div>`;
+                } else {
+                    container.innerHTML += `
+                    <div class="box" style="width: ${side}px;height: ${side}px;background-color: rgb(${colorR},${colorG},${colorB});" onclick="alert('不要瞎掰好嗎')"></div>
+                    `;
+                }
+            }
+
+            //score 除以3於數是多少
+            if (score % 3 == 0) {
+                if (level < 9) {
+                    level++;
+                    colorUP += 0.05;
+                }
+            }
+
+            //撈出我們所有box
+            const boxes = document.querySelectorAll('.box');
+        }
+
+        function startGame() {
+            container.classList.add('act');
+            scoreContext.classList.add('act');
+            reseteBtn.style.visibility = 'visible';
+            startGameBtn.style.display = 'none';
+
+            var timer = setInterval(function () {
+                time--;
+
+                timeBoard.innerHTML = time;
+                if (time <= 0) {
+                    clearInterval(timer);
+                    alert('時間到囉~請按F5再玩一次~');
+                    alert(scoreContext.innerHTML);
+                }
+            }, 1000);
+        }
+
+        reset();
+    </script>
+</body>
+
+</html>
